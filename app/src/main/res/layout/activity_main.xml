@@ -1,0 +1,140 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:screenOrientation="portrait"
+    android:configChanges="keyboardHidden|orientation|screenSize"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:id="@+id/mainLayout"
+    >
+
+
+
+    <RelativeLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.1"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:background="@android:color/holo_orange_dark"
+        android:orientation="horizontal" >
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                >Header</TextView>
+        </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/gridCanvasLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.6"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal">
+
+        <GridView
+            android:id="@+id/gridCanvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:columnOrderPreserved="true"
+            android:gravity="center"
+            android:horizontalSpacing="1dp"
+            android:verticalSpacing="1dp"
+            android:numColumns="10"
+            android:stretchMode="columnWidth"
+            android:listSelector="@null"
+            ></GridView>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/gridOptions"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.3"
+        android:orientation="horizontal"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        >
+
+        <RelativeLayout
+            android:id="@+id/gridOption0"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:clipChildren="false"
+
+            android:clipToPadding="false">
+
+            <GridView
+                android:id="@+id/gridOptionView0"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:clipChildren="false"
+                android:columnOrderPreserved="true"
+                android:gravity="center"
+                android:horizontalSpacing="1dp"
+                android:verticalSpacing="1dp"
+                android:stretchMode="columnWidth"
+                android:listSelector="@null"></GridView>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/gridOption1"
+            android:layout_centerVertical="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="horizontal">
+
+            <GridView
+                android:id="@+id/gridOptionView1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:columnOrderPreserved="true"
+                android:gravity="center"
+                android:horizontalSpacing="1dp"
+                android:verticalSpacing="1dp"
+                android:stretchMode="columnWidth"
+                android:listSelector="@null"></GridView>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/gridOption2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="horizontal">
+
+            <GridView
+                android:id="@+id/gridOptionView2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:columnOrderPreserved="true"
+                android:gravity="center"
+                android:horizontalSpacing="1dp"
+                android:verticalSpacing="1dp"
+                android:stretchMode="columnWidth"
+                android:listSelector="@null"></GridView>
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

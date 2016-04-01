@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LegoApp</string>
+    <string name="app_welcome">Suswagatham </string>
+    <string name="grid_options_file">/res/raw/lego_options.xml</string>
+</resources>
