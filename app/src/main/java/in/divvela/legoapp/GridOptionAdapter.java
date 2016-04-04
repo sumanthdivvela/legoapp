@@ -22,7 +22,7 @@ public class GridOptionAdapter extends BaseAdapter {
     public GridOptionAdapter(Context context, GridOption option) {
         myContext = context;
         gridOption = option;
-        gridOptionLength = gridOption.getNoOfcols() * gridOption.getNoOfRows();
+        gridOptionLength = gridOption.getNoOfCols() * gridOption.getNoOfRows();
     }
 
     @Override
@@ -34,6 +34,8 @@ public class GridOptionAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView tView;
         GridView gridView = (GridView) parent;
+        gridView.setFocusable(false);
+        gridView.setFocusableInTouchMode(false);
         if (convertView == null) {
             tView = new TextView(myContext);
             tView.setLayoutParams(new GridView.LayoutParams( gridView.getColumnWidth(), gridView.getColumnWidth()));
@@ -62,8 +64,8 @@ public class GridOptionAdapter extends BaseAdapter {
     @Override
     public Object getItem(int position) {
         Integer[][] gridMap = gridOption.getGridMap();
-        int r = (int)Math.floor(position/gridOption.getNoOfcols());
-        int c = position%gridOption.getNoOfcols();
+        int r = (int)Math.floor(position/gridOption.getNoOfCols());
+        int c = position%gridOption.getNoOfCols();
         return gridMap[r][c];
     }
 }

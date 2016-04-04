@@ -23,7 +23,7 @@
     <option>
         <id>5</id>
         <color>#2D659F</color>
-        <map>[1],[1]</map>
+        <map>[1],[1],[1],[1],[1]</map>
     </option>
     <option>
         <id>6</id>
@@ -64,10 +64,5 @@
         <id>13</id>
         <color>#7438B5</color>
         <map>[0,1,0],[1,1,1]</map>
-    </option>
-    <option>
-        <id>14</id>
-        <color>#F389A6</color>
-        <map>[1],[1],[1],[1]</map>
     </option>
 </options>

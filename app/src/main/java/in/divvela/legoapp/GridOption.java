@@ -8,7 +8,7 @@ public class GridOption {
     private final String colorCode;
     private final Integer[][] gridMap;
     private final Integer noOfRows;
-    private final Integer noOfcols;
+    private final Integer noOfCols;
     private final Integer id;
 
     public GridOption(Integer id,String colorCode, Integer[][] gridMap)throws  Exception{
@@ -21,11 +21,9 @@ public class GridOption {
             this.gridMap = gridMap;
             this.noOfRows = gridMap.length;
             //Grid Map is expected to proper rectangle, so length of all rows will be same.
-            this.noOfcols = gridMap[0].length;
+            this.noOfCols = gridMap[0].length;
         }
     };
-
-
 
     public Integer getId() { return id;    }
 
@@ -41,7 +39,7 @@ public class GridOption {
         return noOfRows;
     }
 
-    public Integer getNoOfcols() {
-        return noOfcols;
+    public Integer getNoOfCols() {
+        return noOfCols;
     }
 }

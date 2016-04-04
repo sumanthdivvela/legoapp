@@ -53,12 +53,12 @@ public class  MainActivity extends Activity {
         headerLayout.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, headerHeight));
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, weightPx );
         canvasLayout.setLayoutParams(layoutParams);
-        canvasLayout.setY(headerHeight);
+        canvasLayout.setY(headerHeight+util.getDevicePixels(3));
 
         int optionsHeight = heightPx - headerHeight - weightPx;
-        layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx - headerHeight - weightPx );
+        layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx - headerHeight - weightPx - util.getDevicePixels(5)  );
         gridOptionsLayout.setLayoutParams(layoutParams);
-        gridOptionsLayout.setY(headerHeight + weightPx);
+        gridOptionsLayout.setY(headerHeight + weightPx + util.getDevicePixels(5));
 
         int columnWidth = optionsHeight/5;
         createGridCanvas();
@@ -107,11 +107,11 @@ public class  MainActivity extends Activity {
 
                 gridView = (GridView)gridOptionLayout.getChildAt(0);
                 gridView.setAdapter(new GridOptionAdapter(this, gridOption));
-                gridView.setNumColumns(gridOption.getNoOfcols());
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(cellSize * gridOption.getNoOfcols(), cellSize * gridOption.getNoOfRows());
+                gridView.setNumColumns(gridOption.getNoOfCols());
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(cellSize * gridOption.getNoOfCols(), ViewGroup.LayoutParams.MATCH_PARENT);
                 gridView.setLayoutParams(layoutParams);
 
-                gridView.setX( (gridSize -cellSize * gridOption.getNoOfcols())/2 );
+                gridView.setX( (gridSize -cellSize * gridOption.getNoOfCols())/2 );
 
 
             }
@@ -139,7 +139,7 @@ public class  MainActivity extends Activity {
                     gridOption = gridOptions[i];
                     gridOptionLayout = (RelativeLayout)gridOptionsLayout.getChildAt(i);
                     gridView = (GridView)gridOptionLayout.getChildAt(0);
-                    gridOptionLayout.setOnTouchListener(new GridOptionTouchListener(gridOption,gridView,gridCanvasView.getMeasuredWidth()/10, gridView.getMeasuredWidth()/gridOption.getNoOfcols()));
+                    gridOptionLayout.setOnTouchListener(new GridOptionTouchListener(gridOption,gridView,gridCanvasView.getMeasuredWidth()/10, gridView.getMeasuredWidth()/gridOption.getNoOfCols()));
                 }
 
             }
