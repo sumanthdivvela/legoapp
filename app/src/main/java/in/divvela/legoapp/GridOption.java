@@ -1,17 +1,20 @@
 package in.divvela.legoapp;
 
+import android.widget.RelativeLayout;
+
 /**
  * Created by KH121 on 3/21/2016.
  */
-public class GridOption {
+public class GridOption implements  Cloneable{
 
     private final String colorCode;
-    private final Integer[][] gridMap;
+    private final Boolean[][] gridMap;
     private final Integer noOfRows;
     private final Integer noOfCols;
-    private final Integer id;
+    private final String id;
+    RelativeLayout view;
 
-    public GridOption(Integer id,String colorCode, Integer[][] gridMap)throws  Exception{
+    public GridOption(String id,String colorCode, Boolean[][] gridMap) throws  Exception{
         this.id = id;
         this.colorCode = colorCode;
         if(gridMap == null)
@@ -25,13 +28,13 @@ public class GridOption {
         }
     };
 
-    public Integer getId() { return id;    }
+    public String getId() { return id;    }
 
     public String getColorCode() {
         return colorCode;
     }
 
-    public Integer[][] getGridMap() {
+    public Boolean[][] getGridMap() {
         return gridMap;
     }
 
@@ -41,5 +44,22 @@ public class GridOption {
 
     public Integer getNoOfCols() {
         return noOfCols;
+    }
+
+    public boolean isNonEmptyCell(int row, int col){
+        return gridMap[row][col];
+    }
+
+    public void setView(RelativeLayout view) {
+        this.view = view;
+    }
+
+    public RelativeLayout getView() {
+        return view;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

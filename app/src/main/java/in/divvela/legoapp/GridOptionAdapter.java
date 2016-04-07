@@ -42,7 +42,7 @@ public class GridOptionAdapter extends BaseAdapter {
             tView.setBackgroundResource(R.drawable.cells_rounded_corners);
             GradientDrawable drawable = (GradientDrawable) tView.getBackground();
 
-            if( ((Integer)getItem(position)).intValue() == 1 ){
+            if( ((Boolean)getItem(position)) ){
                 drawable.setColor(Color.parseColor(gridOption.getColorCode()));
             }else{
                 drawable.setColor(Color.TRANSPARENT);
@@ -63,7 +63,7 @@ public class GridOptionAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        Integer[][] gridMap = gridOption.getGridMap();
+        Boolean[][] gridMap = gridOption.getGridMap();
         int r = (int)Math.floor(position/gridOption.getNoOfCols());
         int c = position%gridOption.getNoOfCols();
         return gridMap[r][c];

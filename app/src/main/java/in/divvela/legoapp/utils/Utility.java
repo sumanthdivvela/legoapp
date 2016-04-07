@@ -6,7 +6,7 @@ import android.util.TypedValue;
 import java.lang.ref.SoftReference;
 
 /**
- * Created by KH121 on 3/16/2016.
+ * Created by Sumanth Divvela on 3/16/2016.
  */
 public class Utility {
 

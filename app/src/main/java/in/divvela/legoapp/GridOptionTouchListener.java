@@ -3,6 +3,7 @@ package in.divvela.legoapp;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 
 /**
@@ -11,23 +12,45 @@ import android.view.View;
 public class GridOptionTouchListener implements View.OnTouchListener {
 
 
-    private float preX = 0;
-    private float preY = 0;
+    private float x1 = 0;
+    private float y1 = 0;
+    private float x2 = 0;
+    private float y2 = 0;
     private float startX = 0;
+    private float startY = 0;
     private int touchSlop = 5;
-    private GridOption gridOption;
-    private View view;
-    private float ratio;
+    private int id;
 
-    public GridOptionTouchListener(GridOption gridOption, View view,int mainGridColumnWidth,int cellSize){
+    private float ratio;
+    private GridOption gridOption;
+    private Boolean gridOptionMatched = false;
+
+    GameManager gameManager;
+    public GridOptionTouchListener(int id, GameManager gameManager){
         super();
-        this.gridOption = gridOption;
-        this.view = view;
-        this.ratio = (float)(mainGridColumnWidth-2)/cellSize;
-        startX = view.getX();
+        this.id = id;
+        this.gameManager = gameManager;
     }
 
+    public void setGridOption(GridOption gridOption) {
+        this.gridOption = gridOption;
+        this.setView(gridOption.getView());
+    }
 
+    public GridOption getGridOption() {
+        return gridOption;
+    }
+
+    public void setRatio(float ratio) {
+        this.ratio = ratio;
+    }
+
+    public void setView(View view) {
+        startX = view.getX();
+        startY = view.getY();
+        view.setPivotX(0);
+        view.setPivotY(0);
+    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -37,51 +60,73 @@ public class GridOptionTouchListener implements View.OnTouchListener {
         switch (action) {
 
             case MotionEvent.ACTION_DOWN: {
-                preX = event.getX();
-                preY = event.getY();
-                selectGridOption();
-               // Log.d("Touch", "touch start." );
+                x2=x1 = event.getX();
+                y2=y1 = event.getY();
+                onTouchStart(v,gridOption);
                 break;
             }
 
             case MotionEvent.ACTION_MOVE: {
-                float deltaX = event.getX() - preX;
-                float deltaY = event.getY() - preY;
+                float deltaX = event.getX() - x2;
+                float deltaY = event.getY() - y2;
                 if (Math.abs(deltaX) > touchSlop || Math.abs(deltaY) > touchSlop) {
-                    preX = event.getX();
-                    preY = event.getY();
-                    updateViewOffset( deltaX, deltaY);
-                    //Log.d("Touch", "touch move. x : " + deltaX + " y: " + deltaY);
+                    x2 = event.getX();
+                    y2 = event.getY();
+                    updateViewOffset(v,x2 - x1, y2 - y1);
+
                 }
                 break;
             }
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
-                preX = 0;
-                preY = 0;
-                reSetViewOffset();
-                //Log.d("Touch", "touch end.");
+                x1 = y2 = x2 = y2 = 0;
+                onTouchEnd(v,gridOption);
                 break;
             }
         }
-
         return true;
     }
 
-    private void updateViewOffset( float deltaX, float deltaY) {
-        view.setX(view.getX() + deltaX);
-        view.setY(view.getY() + deltaY);
-    }
-
-    private void reSetViewOffset() {
-        view.animate().setDuration(2).scaleX(1).scaleY(1).translationY(0).translationX(startX);
-    }
-
-    private void selectGridOption(){
-        view.animate().setDuration(2).scaleX(ratio).scaleY(ratio).translationY(-100);
+    private void updateViewOffset( View v,float deltaX, float deltaY) {
+        onTouchMove(v,gridOption, deltaX, deltaY);
     }
 
 
+    public void onTouchStart(View v, GridOption gridOption){
+        View view = gridOption.getView();
+        v.bringToFront();
+        view.bringToFront();
+        view.animate().setDuration(2).scaleX(ratio).scaleY(ratio).translationY(-100).translationX(startX);
+    }
+
+    public void onTouchMove(View v,GridOption gridOption, float deltaX, float deltaY){
+
+        float left = startX + deltaX;
+        float top = startY + deltaY - 100;
+
+        gridOptionMatched= GridCanvasHelper.identifyBoundingRect(left, top, gridOption);
+
+    }
+
+
+
+    public void onTouchEnd(View v,GridOption gridOption){
+        if(gridOptionMatched) {
+            v.setOnTouchListener(new View.OnTouchListener(){
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return false;
+                }
+            });
+            GridCanvasHelper.snapGridOption(gridOption);
+            gameManager.handleOptionMatch(gridOption, id);
+        }else{
+            View view = gridOption.getView();
+            if(view != null){
+                view.animate().setDuration(2).scaleX(1).scaleY(1).translationY(0).translationX(startX);
+            }
+        }
+    }
 
 }

@@ -1,6 +1,7 @@
 package in.divvela.legoapp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,14 +29,18 @@ import in.divvela.legoapp.utils.Utility;
  */
 public class  MainActivity extends Activity {
 
-    private Utility util;
-    private GridOption[] gridOptions;
+    public static Utility util;
+    static Context gContext;
 
+
+    int legoOptionSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        gContext = this.getApplicationContext();
+
         util = new Utility(this);
         setContentView(R.layout.activity_main);
 
@@ -48,103 +54,65 @@ public class  MainActivity extends Activity {
         RelativeLayout canvasLayout = (RelativeLayout) findViewById(R.id.gridCanvasLayout);
         RelativeLayout gridOptionsLayout = (RelativeLayout) findViewById(R.id.gridOptions);
         int headerHeight = heightPx * 10/100;
-        int canvasHeight = weightPx * 60/100;
 
         headerLayout.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, headerHeight));
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, weightPx );
         canvasLayout.setLayoutParams(layoutParams);
-        canvasLayout.setY(headerHeight+util.getDevicePixels(3));
+        canvasLayout.setY(headerHeight + util.getDevicePixels(3));
 
-        int optionsHeight = heightPx - headerHeight - weightPx;
-        layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx - headerHeight - weightPx - util.getDevicePixels(5)  );
+        canvasLayout.addView(GridCanvasHelper.createGridCanvasView(gContext, weightPx));
+
+        int optionsHeight = heightPx - headerHeight - weightPx - util.getDevicePixels(5);
+        layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, optionsHeight );
         gridOptionsLayout.setLayoutParams(layoutParams);
         gridOptionsLayout.setY(headerHeight + weightPx + util.getDevicePixels(5));
 
-        int columnWidth = optionsHeight/5;
-        createGridCanvas();
-        createGridOptions(gridOptionsLayout,metrics,columnWidth);
-        addTouchListeners();
+        int columnWidth = Math.min(optionsHeight, weightPx/3)/5;
+        //createGridCanvas();
+
+        updateGridOptionsLayout(gridOptionsLayout, metrics);
+        postApplicationLaunch();
     }
 
 
-
-    private int createGridCanvas(){
-
-        GridView gridView = (GridView) findViewById(R.id.gridCanvas);
-        gridView.setAdapter(new CellAdapter(this));
-
-        //Set column width and set height to width of grid.
-        int gridWidth = gridView.getWidth();
-        int columnWidth = gridWidth/10;
-        columnWidth = gridView.getColumnWidth();
-        gridView.setMinimumHeight(gridWidth);
-        return columnWidth;
-    }
-
-    private void createGridOptions(RelativeLayout gridOptionsLayout, DisplayMetrics metrics, int mainGridColumnWidth ){
-        GridOptionsFactory gridOptionsFactory = new GridOptionsFactory();
-        gridOptionsFactory.loadGridOptions(this);
-
+    private void updateGridOptionsLayout(RelativeLayout gridOptionsLayout, DisplayMetrics metrics){
         try{
-            gridOptions = gridOptionsFactory.getGridOptions();
-            GridOption gridOption;
-            RelativeLayout gridOptionLayout;
-            GridView gridView;
-            gridOptionsLayout.bringToFront();
-
             int widthPixels  = metrics.widthPixels;
-            int heightPx = metrics.heightPixels;
-            int cellSize = Math.min(widthPixels/15, mainGridColumnWidth);
-            int gridSize = widthPixels / 3;
-
-            for(int i = 0; i < gridOptions.length; i++){
-                gridOption = gridOptions[i];
+            legoOptionSize = widthPixels/3;
+            RelativeLayout gridOptionLayout;
+            gridOptionsLayout.bringToFront();
+            int count = gridOptionsLayout.getChildCount();
+            for(int i = 0; i < count; i++){
                 gridOptionLayout = (RelativeLayout)gridOptionsLayout.getChildAt(i);
-
-                RelativeLayout.LayoutParams parentLayoutParams = new RelativeLayout.LayoutParams(gridSize, ViewGroup.LayoutParams.MATCH_PARENT);
-                gridOptionLayout.setLayoutParams(parentLayoutParams);
-                gridOptionLayout.setX(i * gridSize);
-
-                gridView = (GridView)gridOptionLayout.getChildAt(0);
-                gridView.setAdapter(new GridOptionAdapter(this, gridOption));
-                gridView.setNumColumns(gridOption.getNoOfCols());
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(cellSize * gridOption.getNoOfCols(), ViewGroup.LayoutParams.MATCH_PARENT);
-                gridView.setLayoutParams(layoutParams);
-
-                gridView.setX( (gridSize -cellSize * gridOption.getNoOfCols())/2 );
-
-
+                gridOptionLayout.setLayoutParams(new RelativeLayout.LayoutParams(legoOptionSize, ViewGroup.LayoutParams.MATCH_PARENT));
+                gridOptionLayout.setX(legoOptionSize*i);
             }
+
         }catch (Exception e){
             Log.e("Lego Options: ", e.getMessage());
         }
     }
 
-    private void addTouchListeners(){
-        RelativeLayout mainLayout = (RelativeLayout) findViewById(R.id.headerLayout);
 
-        mainLayout.post(new Runnable() {
+
+    private void postApplicationLaunch(){
+
+        RelativeLayout gridOptionsLayout = (RelativeLayout) findViewById(R.id.gridOptions);
+        gridOptionsLayout.post(new Runnable() {
             // Post in the parent's message queue to make sure the parent
             // lays out its children before you call getHitRect()
             @Override
             public void run() {
                 RelativeLayout gridOptionsLayout = (RelativeLayout) findViewById(R.id.gridOptions);
-                RelativeLayout gridOptionLayout;
-                GridOption gridOption;
-                GridView gridView;
-
-                GridView gridCanvasView = (GridView) findViewById(R.id.gridCanvas);
-
-                for(int i = 0; i < gridOptions.length; i++) {
-                    gridOption = gridOptions[i];
-                    gridOptionLayout = (RelativeLayout)gridOptionsLayout.getChildAt(i);
-                    gridView = (GridView)gridOptionLayout.getChildAt(0);
-                    gridOptionLayout.setOnTouchListener(new GridOptionTouchListener(gridOption,gridView,gridCanvasView.getMeasuredWidth()/10, gridView.getMeasuredWidth()/gridOption.getNoOfCols()));
-                }
-
+                RelativeLayout gridView = (RelativeLayout) findViewById(R.id.gridCanvas);
+                GameManager manager = new GameManager(gridView, gridOptionsLayout, MainActivity.gContext);
+                manager.startGame();
             }
         });
     }
+
+
+
 
     @Override
     protected void onPause() {
@@ -158,4 +126,5 @@ public class  MainActivity extends Activity {
         super.onSaveInstanceState(outState);
          /* TODO */
     }
+
 }

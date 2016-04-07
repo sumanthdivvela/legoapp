@@ -2,39 +2,58 @@ package in.divvela.legoapp;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import in.divvela.legoapp.utils.Utility;
 
 /**
  * Created by Sumanth Divvela on 3/31/2016.
  */
 public class GridOptionsFactory {
 
+
     private GridOption[] legoOptions;
+    private HashMap<String,GridOption> gridOptions = new HashMap<String, GridOption>();
 
-    public GridOption[] getGridOptions(){
+    public ArrayList<GridOption>  getGridOptions(Context context,int parentWidth){
 
-        GridOption[] gridOptions = new GridOption[3];
+        ArrayList<GridOption> gridOptions = new ArrayList<GridOption>();
         Randomizer randomizer = Randomizer.getInstance();
         int[] randomInts = randomizer.getRandomInts(3,legoOptions.length,legoOptions.length);
+        try{
+            for(int i =0; i < randomInts.length; i++){
+                gridOptions.add((GridOption)legoOptions[randomInts[i]].clone());
+            }
+            createGridOptionViews(context,gridOptions, parentWidth);
+        }catch(CloneNotSupportedException e){
 
-        for(int i =0; i < randomInts.length; i++){
-            gridOptions[i] = legoOptions[randomInts[i]];
         }
         return gridOptions;
+    }
+
+    public GridOption getGridOption(String id){
+        return gridOptions.get(id);
     }
 
     public void loadGridOptions(Context context){
 
         XmlResourceParser xrp = context.getResources().getXml(R.xml.lego_options);
-        ArrayList <GridOption> gridOptions = new ArrayList<GridOption>();
+
         GridOption gridOption;
-        Integer id = 0;
+        String id = "";
         String colorCode = "";
-        Integer[][] gridMap = {};
+        Boolean[][] gridMap = {};
 
         try{
             xrp.next();
@@ -49,7 +68,7 @@ public class GridOptionsFactory {
                     eventType = xrp.next();
                     if(eventType == XmlPullParser.TEXT)
                     {
-                        id= new Integer(xrp.getText());
+                        id= xrp.getText();
                     }
                 }
                 if (eventType == XmlPullParser.START_TAG
@@ -71,7 +90,7 @@ public class GridOptionsFactory {
                 if(eventType == XmlPullParser.END_TAG && xrp.getName().equalsIgnoreCase("option"))
                 {
                     gridOption = new GridOption(id,colorCode,gridMap);
-                    gridOptions.add(gridOption);
+                    gridOptions.put(id,gridOption);
                 }
                 eventType = xrp.next();
             }
@@ -82,30 +101,79 @@ public class GridOptionsFactory {
             xrp.close();
         }
         legoOptions = new GridOption[gridOptions.size()];
-        legoOptions = gridOptions.toArray(legoOptions);
+        legoOptions = gridOptions.values().toArray(legoOptions);
+
     }
 
-    private Integer[][] getGridMap(String map){
+    private Boolean[][] getGridMap(String map){
 
         String[] rows = map.split("],");
         String[] cols;
         String colStr;
-        Integer[] colsInt;
-        Integer[][] gridMap = new Integer[rows.length][];
+        Boolean[] colsInt;
+        Boolean[][] gridMap = new Boolean[rows.length][];
 
         for(int row=0; row < rows.length; row++){
             colStr = rows[row];
             cols = colStr.replaceAll("\\[", "").replaceAll("\\]", "").split(",");
-            colsInt = new Integer[cols.length];
+            colsInt = new Boolean[cols.length];
             for(int col=0; col < cols.length; col++){
                 try {
-                    colsInt[col] = new Integer(cols[col]);
+                    colsInt[col] = new Boolean(cols[col].equals("1") ? true: false);
                 }catch (NumberFormatException nfe) {
-                    colsInt[col] = new Integer(0);
+                    colsInt[col] = new Boolean(false);
                 };
             }
             gridMap[row] = colsInt;
         }
         return gridMap;
     }
+
+    public void createGridOptionViews(Context mContext,  ArrayList<GridOption>  gridOptions, int parentWidth) {
+        int optionCount = gridOptions.size();
+        for(int i =0; i< optionCount; i++){
+            GridOption gridOption = gridOptions.get(i);
+            gridOption.setView(createGridOptionView(mContext, parentWidth, gridOption));
+        }
+        return;
+    }
+
+    public RelativeLayout createGridOptionView(Context mContext, int parentWidth, GridOption gridOption) {
+        RelativeLayout relLayout = (RelativeLayout) LayoutInflater.from(mContext).inflate(
+                R.layout.grid_option, null);
+
+        TextView tView;
+        int noOfCols = gridOption.getNoOfCols();
+        int noOfRows = gridOption.getNoOfRows();
+        Boolean[][] gridMap = gridOption.getGridMap();
+        Boolean[] rows;
+        int cellWidth = parentWidth / 5;
+        Utility util = MainActivity.util;
+        int margin = util.getDevicePixels(2);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(cellWidth-margin, cellWidth-margin);
+
+        //layoutParams.setMargins(margin,margin,margin,margin);
+
+        for (int row = 0; row < noOfRows; row++) {
+            rows = gridMap[row];
+            for (int col = 0; col < noOfCols; col++) {
+                tView = new TextView(mContext);
+                tView.setLayoutParams(layoutParams);
+                tView.setBackgroundResource(R.drawable.cells_rounded_corners);
+                tView.setX(cellWidth * col);
+                tView.setY(cellWidth * row);
+
+                GradientDrawable drawable = (GradientDrawable) tView.getBackground();
+                if (rows[col]) {
+                    drawable.setColor(Color.parseColor(gridOption.getColorCode()));
+                } else {
+                    drawable.setColor(Color.TRANSPARENT);
+                }
+                relLayout.setX((parentWidth- cellWidth * gridOption.getNoOfCols())/2 );
+                relLayout.addView(tView);
+            }
+        }
+        return  relLayout;
+    }
+
 }
